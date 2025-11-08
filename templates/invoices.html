@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mb-4">Member Balances (AGGREGATE) & Latest Invoices (NESTED)</h2>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <h5>Balances</h5>
+    <table class="table table-sm table-striped">
+      <thead><tr><th>Member</th><th>Total</th><th>Paid</th><th>Due</th></tr></thead>
+      <tbody>
+        {% for b in balances %}
+        <tr>
+          <td>{{ b.full_name }}</td>
+          <td>{{ "%.2f"|format(b.total or 0) }}</td>
+          <td>{{ "%.2f"|format(b.paid or 0) }}</td>
+          <td>{{ "%.2f"|format(b.due or 0) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-lg-6">
+    <h5>Latest Invoices</h5>
+    <table class="table table-sm table-striped align-middle">
+      <thead><tr><th>ID</th><th>Member</th><th>Date</th><th>Status</th><th>Total</th><th>Pay</th></tr></thead>
+      <tbody>
+        {% for inv in latest %}
+        <tr>
+          <td>{{ inv.invoice_id }}</td>
+          <td>{{ inv.full_name }}</td>
+          <td>{{ inv.invoice_date }}</td>
+          <td>
+            {% if inv.status == 'PAID' %}
+              <span class="badge text-bg-success">PAID</span>
+            {% elif inv.status == 'PARTIAL' %}
+              <span class="badge text-bg-warning">PARTIAL</span>
+            {% else %}
+              <span class="badge text-bg-secondary">{{ inv.status }}</span>
+            {% endif %}
+          </td>
+          <td>{{ "%.2f"|format(inv.total_amount or 0) }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('invoice_pay', invoice_id=inv.invoice_id) }}" class="d-flex gap-2">
+              <input name="amount" type="number" min="0.01" step="0.01"
+                     class="form-control form-control-sm" placeholder="Amount"
+                     {% if inv.status == 'PAID' %}disabled{% endif %} required>
+              <select name="method" class="form-select form-select-sm"
+                      {% if inv.status == 'PAID' %}disabled{% endif %}>
+                <option value="CASH">CASH</option>
+                <option value="UPI">UPI</option>
+                <option value="CARD">CARD</option>
+              </select>
+              <button type="submit" class="btn btn-success btn-sm"
+                      {% if inv.status == 'PAID' %}disabled{% endif %}>Pay</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <small class="text-muted">Pay inserts into <code>payment</code>; trigger <code>trg_payment_update</code> updates <code>invoice.status</code>.</small>
+  </div>
+</div>
+{% endblock %}

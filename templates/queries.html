@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mb-4">Queries Showcase</h2>
+
+<h5>JOIN query: Bookings × Rooms × Members</h5>
+<table class="table table-sm table-striped">
+  <thead>
+    <tr><th>ID</th><th>Room</th><th>Member</th><th>Start</th><th>End</th></tr>
+  </thead>
+  <tbody>
+    {% for r in join_rows %}
+    <tr>
+      <td>{{ r.id }}</td>
+      <td>{{ r.room }}</td>
+      <td>{{ r.member }}</td>
+      <td>{{ r.start_time }}</td>
+      <td>{{ r.end_time }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h5 class="mt-4">AGGREGATE query: Booking counts per room</h5>
+<table class="table table-sm table-striped">
+  <thead>
+    <tr><th>Room ID</th><th>#Bookings</th></tr>
+  </thead>
+  <tbody>
+    {% for a in agg_rows %}
+    <tr>
+      <td>{{ a.room_id }}</td>
+      <td>{{ a.bookings }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

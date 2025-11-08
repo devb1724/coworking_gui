@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mb-4">New Booking</h2>
+
+<form method="POST" action="{{ url_for('booking_create') }}" class="row g-3">
+  <div class="col-md-6">
+    <label class="form-label">Member</label>
+    <select name="member_id" class="form-select" required>
+      {% for m in members %}
+        <option value="{{ m.member_id }}">{{ m.full_name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">Room</label>
+    <select name="room_id" class="form-select" required>
+      {% for r in rooms %}
+        <option value="{{ r.room_id }}">{{ r.room_name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">Start (YYYY-MM-DD HH:MM:SS)</label>
+    <input name="start_time" class="form-control" placeholder="2025-10-27 13:00:00" required>
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">End (YYYY-MM-DD HH:MM:SS)</label>
+    <input name="end_time" class="form-control" placeholder="2025-10-27 15:00:00" required>
+  </div>
+
+  <div class="col-12">
+    <button type="submit" class="btn btn-success">Save</button>
+    <a href="{{ url_for('bookings_list') }}" class="btn btn-outline-secondary">Cancel</a>
+  </div>
+</form>
+{% endblock %}

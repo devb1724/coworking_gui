@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mb-4">{{ 'Edit Member' if member else 'New Member' }}</h2>
+
+<form method="POST"
+      action="{{ url_for('member_update', member_id=member.member_id) if member else url_for('member_create') }}"
+      class="row g-3" novalidate>
+
+  <div class="col-md-6">
+    <label class="form-label">Full name</label>
+    <input name="full_name" class="form-control" maxlength="120" required
+           value="{{ member.full_name if member else '' }}">
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">Email</label>
+    <input name="email" type="email" class="form-control" maxlength="120" required
+           value="{{ member.email if member else '' }}">
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">Phone</label>
+    <input name="phone" class="form-control" maxlength="20"
+           value="{{ member.phone if member else '' }}">
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">Company</label>
+    <select name="company_id" class="form-select">
+      {% for c in companies %}
+        <option value="{{ c.company_id }}"
+          {% if member and member.company_id == c.company_id %}selected{% endif %}>{{ c.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-12 d-flex gap-2">
+    <button type="submit" class="btn btn-success">Save</button>
+    <a href="{{ url_for('members_list') }}" class="btn btn-outline-secondary">Cancel</a>
+  </div>
+</form>
+{% endblock %}

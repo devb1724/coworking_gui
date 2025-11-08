@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Dashboard</h3>
+<div class="row g-3">
+  <div class="col-md-4"><div class="card p-3"><b>Members:</b> {{members}}</div></div>
+  <div class="col-md-4"><div class="card p-3"><b>Rooms:</b> {{rooms}}</div></div>
+  <div class="col-md-4"><div class="card p-3"><b>Bookings:</b> {{bookings}}</div></div>
+</div>
+{% endblock %}

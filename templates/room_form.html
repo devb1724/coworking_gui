@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mb-4">{{ 'Edit Room' if room else 'New Room' }}</h2>
+
+<form method="POST"
+      action="{{ url_for('room_update', room_id=room.room_id) if room else url_for('room_create') }}"
+      class="row g-3" novalidate>
+
+  <div class="col-md-6">
+    <label class="form-label">Name</label>
+    <input name="room_name" class="form-control" maxlength="80" required
+           value="{{ room.room_name if room else '' }}">
+    <div class="form-text">Must be unique.</div>
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">Kind</label>
+    <select name="kind" class="form-select">
+      {% set k = room.kind if room else '' %}
+      <option value="OPEN"     {% if k == 'OPEN' %}selected{% endif %}>OPEN</option>
+      <option value="DEDICATED"{% if k == 'DEDICATED' %}selected{% endif %}>DEDICATED</option>
+      <option value="PRIVATE"  {% if k == 'PRIVATE' %}selected{% endif %}>PRIVATE</option>
+      <option value="MEETING"  {% if k == 'MEETING' %}selected{% endif %}>MEETING</option>
+    </select>
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">Capacity</label>
+    <input name="capacity" type="number" min="1" step="1" class="form-control" required
+           value="{{ room.capacity if room else 1 }}">
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">Rate/hr</label>
+    <input name="hourly_rate" type="number" min="0" step="0.01" class="form-control" required
+           value="{{ room.hourly_rate if room else 0 }}">
+  </div>
+
+  <div class="col-12 d-flex gap-2">
+    <button type="submit" class="btn btn-success">Save</button>
+    <a href="{{ url_for('rooms_list') }}" class="btn btn-outline-secondary">Cancel</a>
+  </div>
+</form>
+{% endblock %}

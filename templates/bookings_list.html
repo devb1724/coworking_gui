@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="mb-4">Bookings (JOIN demo)</h2>
+
+<div class="d-flex justify-content-end mb-3">
+  <a class="btn btn-primary" href="{{ url_for('booking_new') }}">+ New Booking</a>
+</div>
+
+<table class="table table-sm table-striped align-middle">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Room</th>
+      <th>Member</th>
+      <th>Start</th>
+      <th>End</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in rows %}
+    <tr>
+      <td>{{ r.booking_id }}</td>
+      <td>{{ r.room }}</td>
+      <td>{{ r.member }}</td>
+      <td>{{ r.start_time }}</td>
+      <td>{{ r.end_time }}</td>
+      <td>{{ r.status }}</td>
+      <td>
+        <form method="POST"
+              action="{{ url_for('booking_delete', booking_id=r.booking_id) }}"
+              onsubmit="return confirm('Delete this booking?');">
+          <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
