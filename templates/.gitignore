@@ -1,0 +1,72 @@
+# -----------------------------
+# 🐍 Python / Flask
+# -----------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.log
+instance/
+.env
+.env.*
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+*.egg-info/
+*.egg
+*.manifest
+*.spec
+
+# -----------------------------
+# ⚙️ IDE / Editor
+# -----------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# -----------------------------
+# 🍎 macOS system files
+# -----------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# -----------------------------
+# 🧪 Jupyter / Colab (if used)
+# -----------------------------
+.ipynb_checkpoints/
+*.ipynb
+
+# -----------------------------
+# 🗃️ Build / Cache
+# -----------------------------
+build/
+dist/
+*.egg-info/
+__pycache__/
+*.bak
+*.tmp
+*.old
+
+# -----------------------------
+# 🔐 Secrets / Keys
+# -----------------------------
+secret_key.txt
+config.json
+credentials.json
+*.pem
+*.crt
+*.key
+
+# -----------------------------
+# 🧩 Other project-specific
+# -----------------------------
+# Ignore your MySQL credentials helper if you have one
+db_config.py
