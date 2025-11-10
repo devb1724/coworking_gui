@@ -282,36 +282,25 @@ def booking_new():
 def booking_create():
     member_id = request.form["member_id"]
     room_id   = request.form["room_id"]
-    start     = request.form["start_time"].strip()   # e.g. "2025-11-15 10:30:00"
+    start     = request.form["start_time"].strip()   # "YYYY-MM-DD HH:MM:SS"
     end       = request.form["end_time"].strip()
 
     with get_conn() as conn, conn.cursor() as cur:
         try:
-            # however you insert a booking — e.g. direct INSERT or proc call
-            # Example if you use a stored proc:
-            # cur.execute("CALL sp_book_room(%s,%s,%s,%s)", (member_id, room_id, start, end))
-
             cur.execute("""
                 INSERT INTO booking(member_id, room_id, start_time, end_time, status)
                 VALUES (%s,%s,%s,%s,'CONFIRMED')
             """, (member_id, room_id, start, end))
-
-            # If you’re creating invoices in-app instead of trigger, add:
-            # cur.execute("SELECT LAST_INSERT_ID() AS id")
-            # booking_id = cur.fetchone()["id"]
-            # cur.execute("CALL sp_invoice_booking(%s)", (booking_id,))
-
             conn.commit()
             flash("Booking created.", "success")
         except pymysql.err.OperationalError as e:
             conn.rollback()
-            # 1644 = user-defined SIGNAL (what your overlap check raises)
+            # 1644 = SIGNAL from trigger (e.g., overlap)
             if e.args and e.args[0] == 1644:
-                # Use DB message if present; otherwise a friendly fallback
-                msg = e.args[1] if len(e.args) > 1 and e.args[1] else "Room already has a booking in that time range."
+                msg = e.args[1] if len(e.args) > 1 and e.args[1] else \
+                      "Room already has a booking in that time range."
                 flash(msg, "warning")
             else:
-                # bubble up anything unexpected while you're still debugging
                 raise
         except pymysql.err.IntegrityError:
             conn.rollback()
@@ -413,6 +402,48 @@ def queries_page():
         agg_rows = cur.fetchall()
 
     return render_template("queries.html", join_rows=join_rows, agg_rows=agg_rows)
+
+# ============================== REPORTS =============================
+@app.get("/reports")
+def reports():
+    with get_conn() as conn, conn.cursor() as cur:
+        # KPI 1: Active members
+        cur.execute("SELECT COUNT(*) AS active_members FROM member WHERE status='ACTIVE'")
+        active_members = cur.fetchone()["active_members"]
+
+        # KPI 2: Total revenue (sum of all payments)
+        cur.execute("SELECT IFNULL(SUM(amount),0) AS total_revenue FROM payment")
+        total_revenue = cur.fetchone()["total_revenue"]
+
+        # Top pending dues (member-wise)
+        cur.execute("""
+            SELECT i.member_id,
+                   SUM(fn_invoice_total(i.invoice_id)) - SUM(fn_invoice_paid_amount(i.invoice_id)) AS due
+            FROM invoice i
+            GROUP BY i.member_id
+            HAVING due > 0
+            ORDER BY due DESC
+            LIMIT 10
+        """)
+        dues = cur.fetchall()
+
+        # Revenue by day (last 14 entries)
+        cur.execute("""
+            SELECT DATE(p.paid_on) AS day, ROUND(SUM(p.amount),2) AS revenue
+            FROM payment p
+            GROUP BY DATE(p.paid_on)
+            ORDER BY day DESC
+            LIMIT 14
+        """)
+        rev_by_day = cur.fetchall()
+
+    return render_template(
+        "reports.html",
+        active_members=active_members,
+        total_revenue=total_revenue,
+        dues=dues,
+        rev_by_day=rev_by_day
+    )
 
 # ================================ MAIN ==============================
 if __name__ == "__main__":
